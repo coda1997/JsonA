@@ -1,4 +1,4 @@
-package Symbol;
+package symbol;
 
 /**
  * Created by 60440 on 2017/5/24.

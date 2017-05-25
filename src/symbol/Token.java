@@ -1,4 +1,4 @@
-package Symbol;
+package symbol;
 
 /**
  * Created by 60440 on 2017/5/24.
@@ -6,7 +6,7 @@ package Symbol;
 public class Token {
     private final Tag tag;
     private final String tokenValue;
-    
+
     private int line;
     private int position;
     public enum Tag{
@@ -32,9 +32,17 @@ public class Token {
     public boolean tokenEqual(Token token){
         return tag.equals(token.getTag());
     }
+    public boolean valueEqual(Token token){
+        return tokenEqual(token)&&tokenValue.equals(token.getTokenValue());
+    }
+
+    public String getTokenValue() {
+        return tokenValue;
+    }
 
     @Override
     public String toString() {
+
         return "Token{" +
                 "tag=" + tag +
                 ", tokenValue='" + tokenValue + '\'' +
