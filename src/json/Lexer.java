@@ -35,12 +35,12 @@ public class Lexer {
     public boolean isEnd(){return isEndOfFile;}
 
     private Lexer() {
-        System.out.println("Lexer has beed create only once");
+
     }
 
     public void scan() throws MyException {
         quitWitespace();
-        if(getNumToken()||getIdToken()||getOpToken()){
+        if(getNumToken()||getIdToken()||getOpToken()||getSpecValue()){
             return;
         }
     }
@@ -76,9 +76,15 @@ public class Lexer {
                 if(isEndOfFile){
                     return;
                 }
-                if(currentChar == ' ' || currentChar == '\t')
+                if(currentChar == ' ')
                     continue;
-                else if (currentChar == '\n'||(int)currentChar==13){
+                else if(currentChar=='\n'){
+                    position--;
+                    continue;
+                }else if (currentChar=='\t'){
+                  position+=7;
+                  continue;
+                } else if (currentChar=='\r'){
                     position=0;
                     line++;
                 }else
@@ -94,22 +100,22 @@ public class Lexer {
             Token token = null;
             switch (currentChar){
                 case '{':
-                    token=new Token(Token.Tag.LB,currentChar+"");
+                    token=new Token(Token.Tag.LB,"{");
                     break;
                 case '}':
-                    token=new Token(Token.Tag.RB,currentChar+"");
+                    token=new Token(Token.Tag.RB,"}");
                     break;
                 case '[':
-                    token=new Token(Token.Tag.LBK,currentChar+"");
+                    token=new Token(Token.Tag.LBK,"[");
                     break;
                 case ']':
-                    token=new Token(Token.Tag.RBK,currentChar+"");
+                    token=new Token(Token.Tag.RBK,"]");
                     break;
                 case ':':
-                    token=new Token(Token.Tag.SCIENTIFIC,currentChar+"");
+                    token=new Token(Token.Tag.SCIENTIFIC,":");
                     break;
                 case ',':
-                    token = new Token(Token.Tag.COMMA,currentChar+"");
+                    token = new Token(Token.Tag.COMMA,",");
                     break;
                 default:
                     throw new MyException(line+" "+position);
@@ -126,13 +132,9 @@ public class Lexer {
 
     private boolean getIdToken() throws MyException{
         // TODO Auto-generated method stub
-        if((!isEnd())||currentChar=='"'){
+        if((!isEnd())&&currentChar=='"'){
             StringBuffer word = new StringBuffer();
-//            do{
-//
-//                word.append(currentChar);
-//                readNext();
-//            }while(currentChar=='"');
+
             readNext();
             while (currentChar!='"'){
                 if (currentChar=='\\'){
@@ -149,12 +151,83 @@ public class Lexer {
             Token token=new Token(Token.Tag.STRING,wordString);
             token.setLine(line);
             token.setPosition(position);
+            //avoid put wrong position info into the token
+
+            readNext();
+
             tokens.add(token);
             return true;
         }else {
             return false;
         }
     }
+
+    private boolean getSpecValue() throws MyException{
+        boolean isError = true;
+        if(currentChar=='f'){
+            readNext();
+            if(currentChar=='a'){
+                readNext();
+                if (currentChar=='l'){
+                    readNext();
+                    if(currentChar=='s'){
+                        readNext();
+                        if(currentChar=='e'){
+                            Token token = new Token(Token.Tag.FALSET,"false");
+                            token.setLine(line);
+                            token.setPosition(position);
+                            readNext();
+                            isError=false;
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if(currentChar=='n'){
+            readNext();
+            if(currentChar=='u'){
+                readNext();
+                if(currentChar=='l'){
+                    readNext();
+                    if(currentChar=='l'){
+                        Token token = new Token(Token.Tag.FALSET,"null");
+                        token.setLine(line);
+                        token.setPosition(position);
+                        readNext();
+                        isError=false;
+                        return true;
+                    }
+                }
+            }
+
+        }
+        if(currentChar=='t'){
+            readNext();
+            if(currentChar=='r'){
+                readNext();
+                if (currentChar=='u'){
+                    readNext();
+                    if (currentChar=='e'){
+                        Token token = new Token(Token.Tag.FALSET,"true");
+                        token.setLine(line);
+                        token.setPosition(position);
+                        readNext();
+                        isError=false;
+                        return true;
+                    }
+                }
+            }
+        }
+
+
+        if(isError==true){
+            throw new MyException(line+" "+position);
+        }
+        return false;
+    }
+
 
     private boolean getNumToken() throws MyException{
         StringBuffer stringBuffer = new StringBuffer();
