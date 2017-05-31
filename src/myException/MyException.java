@@ -6,8 +6,15 @@ import symbol.Token;
  * Created by 60440 on 2017/5/25.
  */
 public class MyException extends Exception {
-    public String getMessage(Token token) {
+    private String message = "null";
+    public String getMessage() {
 
-        return token.getErrMss();
+        return message;
+    }
+    public MyException(String msg){
+        message=msg;
+    }
+    public MyException(Token token){
+        message=token.getErrMss();
     }
 }
