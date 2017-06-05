@@ -40,9 +40,7 @@ public class Lexer {
 
     public void scan() throws MyException {
         quitWitespace();
-        if(getNumToken()||getIdToken()||getOpToken()||getSpecValue()){
-            return;
-        }
+        if(getNumToken()||getIdToken()||getOpToken()||getSpecValue());
     }
 
     private boolean readNext() throws MyException {
@@ -112,7 +110,7 @@ public class Lexer {
                     token=new Token(Token.Tag.RBK,"]");
                     break;
                 case ':':
-                    token=new Token(Token.Tag.SCIENTIFIC,":");
+                    token=new Token(Token.Tag.SEMI,":");
                     break;
                 case ',':
                     token = new Token(Token.Tag.COMMA,",");
@@ -192,7 +190,7 @@ public class Lexer {
                 if(currentChar=='l'){
                     readNext();
                     if(currentChar=='l'){
-                        Token token = new Token(Token.Tag.FALSET,"null");
+                        Token token = new Token(Token.Tag.NULLT,"null");
                         token.setLine(line);
                         token.setPosition(position);
                         readNext();
@@ -210,7 +208,7 @@ public class Lexer {
                 if (currentChar=='u'){
                     readNext();
                     if (currentChar=='e'){
-                        Token token = new Token(Token.Tag.FALSET,"true");
+                        Token token = new Token(Token.Tag.TRUET,"true");
                         token.setLine(line);
                         token.setPosition(position);
                         readNext();
