@@ -17,6 +17,7 @@ public class Lexer {
     private char currentChar = ' ';
     private ArrayList<Token> tokens = new ArrayList<>();
     private boolean isEndOfFile = false;
+    private char beforeChar=' ';
 
 
     private static Lexer singleLexer = new Lexer();
@@ -45,7 +46,7 @@ public class Lexer {
 
     private boolean readNext() throws MyException {
         try {
-
+            beforeChar=currentChar;
             int temp=bufferedReader.read();
             if(temp==-1){
                 isEndOfFile=true;
@@ -54,7 +55,8 @@ public class Lexer {
             currentChar=(char) temp;
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            throw new MyException("line: "+line+" position: "+"position");
+            throw new MyException("line "+line+",position "+position+": causeBy<"+beforeChar+">");
+
         }finally {
             position++;
         }
@@ -116,7 +118,7 @@ public class Lexer {
                     token = new Token(Token.Tag.COMMA,",");
                     break;
                 default:
-                    throw new MyException(line+" "+position);
+                    throw new MyException("line "+line+",position "+position+": causeBy<"+beforeChar+">");
             }
             token.setLine(line);
             token.setPosition(position);
@@ -132,7 +134,7 @@ public class Lexer {
         // TODO Auto-generated method stub
         if((!isEnd())&&currentChar=='"'){
             StringBuffer word = new StringBuffer();
-
+            word.append(currentChar);
             readNext();
             while (currentChar!='"'){
                 if (currentChar=='\\'){
@@ -145,6 +147,7 @@ public class Lexer {
                     readNext();
                 }
             }
+            word.append(currentChar);
             String wordString = word.toString();
             Token token=new Token(Token.Tag.STRING,wordString);
             token.setLine(line);
@@ -174,6 +177,7 @@ public class Lexer {
                             Token token = new Token(Token.Tag.FALSET,"false");
                             token.setLine(line);
                             token.setPosition(position);
+                            tokens.add(token);
                             readNext();
                             isError=false;
                             return true;
@@ -193,6 +197,7 @@ public class Lexer {
                         Token token = new Token(Token.Tag.NULLT,"null");
                         token.setLine(line);
                         token.setPosition(position);
+                        tokens.add(token);
                         readNext();
                         isError=false;
                         return true;
@@ -211,6 +216,7 @@ public class Lexer {
                         Token token = new Token(Token.Tag.TRUET,"true");
                         token.setLine(line);
                         token.setPosition(position);
+                        tokens.add(token);
                         readNext();
                         isError=false;
                         return true;
@@ -221,7 +227,7 @@ public class Lexer {
 
 
         if(isError==true){
-            throw new MyException(line+" "+position);
+            throw new MyException("line "+line+",position "+position+": causeBy<"+beforeChar+">");
         }
         return false;
     }
@@ -295,7 +301,6 @@ public class Lexer {
             }
             return true;
         }
-//        throw new MyException(line+" "+position);
         return false;
     }
     private boolean getScien(StringBuffer stringBuffer) throws MyException{
@@ -311,13 +316,15 @@ public class Lexer {
                     stringBuffer.append(currentChar);
                     readNext();
                 }while (Character.isDigit(currentChar));
+                return true;
             }else {
-                throw new MyException(line+" "+position);
+                throw new MyException("line "+line+",position "+position+": causeBy<"+beforeChar+">");
             }
-            return true;
-        }else {
+        }else{
             return false;
+
         }
+
     }
 
 }

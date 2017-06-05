@@ -2,6 +2,7 @@ package json;
 
 import myException.MyException;
 import symbol.Token;
+import utils.FormatUtils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -13,24 +14,45 @@ import java.util.ArrayList;
  */
 public class JsonMain {
     public static void main(String[] args) {
-        String filePath = "src/test01.txt";
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
-            Lexer lexer = Lexer.getSingleLexer().setBufferReader(bufferedReader);
-            while (!lexer.isEnd()){
+        String filePath = "";
+        boolean isNeed = false;
+        int start=0;
+        if(args[0].equals("-pretty")){
+            isNeed=true;
+            start=1;
+        }
+        for(;start<args.length;start++){
+            filePath=args[start];
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath));
+                Lexer lexer = Lexer.getSingleLexer().setBufferReader(bufferedReader);
+                while (!lexer.isEnd()){
 
-                lexer.scan();
-            }
-            ArrayList<Token> tokens=lexer.getTokens();
-            if(tokens.size()>0){
+                    lexer.scan();
+                }
+                ArrayList<Token> tokens=lexer.getTokens();
 
-                Parser parser = new Parser(tokens);
-                parser.parse();
+                if(tokens.size()>0){
+
+                    Parser parser = new Parser(tokens);
+                    parser.parse();
+                    System.out.println("Valid");
+                }
+                if(isNeed){
+                    StringBuffer stringBuffer = new StringBuffer();
+                    for (int i = 0; i < tokens.size(); i++) {
+                        stringBuffer.append(tokens.get(i).getTokenValue());
+                    }
+                    String res = FormatUtils.formatJson(stringBuffer.toString());
+                    String fileP = filePath.substring(0,filePath.length()-5)+"pretty.json";
+                    FormatUtils.toPrettyFile(res,fileP);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (MyException e) {
+                System.out.println(e.getMessage());
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (MyException e) {
-            e.printStackTrace();
         }
     }
+
 }

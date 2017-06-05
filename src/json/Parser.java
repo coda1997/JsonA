@@ -1,9 +1,16 @@
 package json;
 
 import myException.MyException;
+import symbol.DollarS;
+import symbol.JsonS;
+import symbol.Symbol;
 import symbol.Token;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+
 /**
  * Created by 60440 on 2017/6/5.
  */
@@ -16,136 +23,33 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    private Token getNext(){
-        if(index<tokens.size()) {
-            return tokens.get(index);
-        }else {
-            return null;
-        }
-    }
-    private void doNext(){
-        if(index<tokens.size()){
-            index++;
-        }
-    }
 
-    public void parse() throws MyException {
-        if(json()){
-            System.out.println("Valid Json");
-        }else {
-            if (getNext()==null){
-                throw new MyException(tokens.get(tokens.size()-1));
-            }else {
 
-                throw new MyException(getNext());
+    public void parse()  {
+        Queue<Token> tokenQueue = new LinkedList<>();
+        for (Token token:tokens
+             ) {
+            tokenQueue.add(token);
+        }
+        tokenQueue.add(new Token(Token.Tag.DOLLAR,"dollar"));
+        Stack<Symbol> stack= new Stack<>();
+        stack.push(new DollarS());
+        stack.push(new JsonS());
+//        int i =0;
+        try {
+            while (!stack.isEmpty()){
+//                System.out.println(++i+" "+stack.peek().toString());
+                stack.pop().detect(stack,tokenQueue);
             }
+
+        } catch (MyException e) {
+            System.out.println(e.getMessage());
         }
+
 
     }
 
-    private boolean json(){
-        int i =index;
-        boolean res= object()||array();
-        if(res){
-            return true;
-        }else {
-            index=i;
-            return false;
-        }
-    }
 
-    private boolean array() {
-        int i = index;
-        boolean res = checkToken(Token.Tag.LBK)&&elements()&&checkToken(Token.Tag.RBK)
-                ||checkToken(Token.Tag.LBK)&&checkToken(Token.Tag.RBK);
-        if (res){
-            return true;
-        }else {
-            index = i;
-            return false;
-        }
-
-    }
-
-    private boolean elements() {
-        int i = index;
-        boolean res = value()&&checkToken(Token.Tag.COMMA)&&elements()||value();
-        if (res){
-            return true;
-        }else {
-            index = i;
-            return false;
-        }
-    }
-
-    private boolean object() {
-        int i =index;
-        boolean res = checkToken(Token.Tag.LB)&&checkToken(Token.Tag.RB)
-                ||checkToken(Token.Tag.LB)&&members()&&checkToken(Token.Tag.RB);
-        if (res){
-            return true;
-        }else {
-            index=i;
-            return false;
-        }
-    }
-
-    private boolean members() {
-        int i = index;
-        boolean res = pair()&&checkToken(Token.Tag.COMMA)&&members()||pair();
-        if(res){
-            return true;
-        }else {
-            index = i;
-            return false;
-        }
-    }
-
-    private boolean pair() {
-        int i =index;
-        boolean res = checkToken(Token.Tag.STRING)&&checkToken(Token.Tag.SEMI)&&value();
-        if (res){
-            return true;
-        }else {
-            index = i;
-            return false;
-        }
-    }
-
-    private boolean value() {
-        int i = index;
-        boolean res = checkToken(Token.Tag.STRING)||number()||object()||array()||checkToken(Token.Tag.TRUET)
-                ||checkToken(Token.Tag.FALSET)||checkToken(Token.Tag.NULLT);
-        if (res){
-            return true;
-
-        }else {
-            index = i;
-            return false;
-        }
-    }
-
-    private boolean number() {
-        int i = index;
-        boolean res = checkToken(Token.Tag.INTEGER)||checkToken(Token.Tag.FLOAT)||checkToken(Token.Tag.SCIENTIFIC);
-        if (res){
-            return true;
-        }else {
-            index=i;
-            return false;
-        }
-    }
-
-    private boolean checkToken(Token.Tag tag){
-        Token token = getNext();
-
-        if(token!=null&&token.getTag().equals(tag)){
-            doNext();
-            return true;
-        }else {
-            return false;
-        }
-    }
 
 
 }

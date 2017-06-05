@@ -1,16 +1,27 @@
 package symbol;
 
+import java.util.Queue;
+import java.util.Stack;
+
 /**
  * Created by 60440 on 2017/5/24.
  */
-public class Token {
+public class Token extends Symbol{
     private final Tag tag;
     private final String tokenValue;
 
     private int line;
     private int position;
+
+    @Override
+    public void detect(Stack<Symbol> stack, Queue<Token> tokenQueue) {
+        if(tag.equals(tokenQueue.peek().getTag())){
+            tokenQueue.poll();
+        }
+    }
+
     public enum Tag{
-        INTEGER,FLOAT,STRING,SCIENTIFIC,TRUET,FALSET,NULLT,LB,RB,LBK,RBK,SEMI,COMMA
+        INTEGER,FLOAT,STRING,SCIENTIFIC,TRUET,FALSET,NULLT,LB,RB,LBK,RBK,SEMI,COMMA,DOLLAR
     }
 
     public Token(Tag tag,String value) {
@@ -52,6 +63,6 @@ public class Token {
     }
 
     public String getErrMss(){
-        return "Error (line "+line+" position "+position+" )";
+        return "line "+line+" position "+position+": expected<"+tokenValue+">";
     }
 }
