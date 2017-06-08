@@ -35,10 +35,8 @@ public class Parser {
         Stack<Symbol> stack= new Stack<>();
         stack.push(new DollarS());
         stack.push(new JsonS());
-//        int i =0;
         try {
             while (!stack.isEmpty()){
-//                System.out.println(++i+" "+stack.peek().toString());
                 stack.pop().detect(stack,tokenQueue);
             }
 

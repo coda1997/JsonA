@@ -40,6 +40,7 @@ public class Lexer {
     }
 
     public void scan() throws MyException {
+
         quitWitespace();
         if(getNumToken()||getIdToken()||getOpToken()||getSpecValue());
     }
@@ -96,6 +97,10 @@ public class Lexer {
     }
 
     private boolean getOpToken() throws MyException{
+        if(isEnd()){
+            return false;
+        }
+
         if(isOperatior(currentChar)){
             Token token = null;
             switch (currentChar){
@@ -137,6 +142,9 @@ public class Lexer {
             word.append(currentChar);
             readNext();
             while (currentChar!='"'){
+                if(isEnd()){
+                    return false;
+                }
                 if (currentChar=='\\'){
                     word.append(currentChar);
                     readNext();
@@ -164,6 +172,8 @@ public class Lexer {
     }
 
     private boolean getSpecValue() throws MyException{
+        if(isEnd())
+            return false;
         boolean isError = true;
         if(currentChar=='f'){
             readNext();
@@ -270,7 +280,7 @@ public class Lexer {
             return true;
         }
         if(currentChar=='1'||currentChar=='2'||currentChar=='3'||currentChar=='4'||currentChar=='5'||currentChar=='6'
-                ||currentChar=='7'||currentChar=='9'||currentChar=='9'){
+                ||currentChar=='7'||currentChar=='8'||currentChar=='9'){
             do{
                 stringBuffer.append(currentChar);
                 readNext();

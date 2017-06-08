@@ -3,6 +3,7 @@ package json;
 import myException.MyException;
 import symbol.Token;
 import utils.FormatUtils;
+import utils.JsonUtils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -16,11 +17,16 @@ public class JsonMain {
     public static void main(String[] args) {
         String filePath = "";
         boolean isNeed = false;
+        boolean isFind = false;
         int start=0;
         if(args[0].equals("-pretty")){
             isNeed=true;
             start=1;
+        }else if(args[0].equals("-find")){
+            isFind=true;
+            start=2;
         }
+
         for(;start<args.length;start++){
             filePath=args[start];
             try {
@@ -46,6 +52,10 @@ public class JsonMain {
                     String res = FormatUtils.formatJson(stringBuffer.toString());
                     String fileP = filePath.substring(0,filePath.length()-5)+"pretty.json";
                     FormatUtils.toPrettyFile(res,fileP);
+                }
+
+                if (isFind){
+                    System.out.println(JsonUtils.jsonFind(tokens,args[1]));
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
